@@ -1,7 +1,7 @@
 [package]
 name = "nel"
 description = "Basic utilities for building and sending NEL reports."
-version = "0.1.6"
+version = "0.2.0"
 authors = ["Noah Kennedy <nkennedy@cloudflare.com>", "Brendan McMillion"]
 license = "BSD-3-Clause"
 repository = "https://github.com/cloudflare/nel-rs"
@@ -13,11 +13,16 @@ deadqueue = { version = "0.2", features = ["limited"] }
 futures-util = "0.3.17"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+# Classification-only: we name `rustls::Error` / `CertificateError` but never
+# run a handshake. Do not add a crypto-provider feature (ring / aws-lc-rs) —
+# the downstream binary's TLS client picks one. See README § TLS backend.
 rustls = { version = "0.23", default-features = false, features = ["std"] }
 ttl_cache = "0.5.1"
 url = "2.2.2"
 rand = "0.10"
 
+# No TLS feature: the consuming binary must enable `rustls-tls` / `native-tls`
+# on its own reqwest dep. See README § TLS backend.
 reqwest = { version = "0.12", default-features = false, optional = true }
 hyper = { version = "1", default-features = false, optional = true }
 
