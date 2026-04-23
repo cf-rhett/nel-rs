@@ -21,6 +21,9 @@ impl From<&hyper::Error> for super::Error {
         use std::error::Error;
 
         // If this is caused by an underlying I/O error, delegate to that.
+        // The I/O error classifier picks up rustls TLS failures via the nested
+        // source chain, which is the replacement for hyper 0.14's `is_connect()`
+        // branch (removed in hyper 1).
         let mut source = err.source();
         while let Some(err) = source {
             if let Some(io_err) = err.downcast_ref::<std::io::Error>() {
@@ -30,27 +33,7 @@ impl From<&hyper::Error> for super::Error {
             source = err.source();
         }
 
-        // Many of these matches contain a std::io::Error as an inner, but we want
-        // to handle them specially.
-        if err.is_connect() {
-            // this was an error from `Connect`. Could be any number of things.
-            if let Some(source) = err.source() {
-                match source.to_string() {
-                    s if s.contains("Hostname mismatch") => {
-                        super::Error::new("tls", "cert.name_invalid")
-                    }
-                    s if s.contains("certificate has expired") => {
-                        super::Error::new("tls", "cert.date_invalid")
-                    }
-                    s if s.contains("self signed certificate in certificate chain") => {
-                        super::Error::new("tls", "cert.authority_invalid")
-                    }
-                    _ => super::Error::new("tcp", "failed"),
-                }
-            } else {
-                super::Error::new("tcp", "failed")
-            }
-        } else if err.is_parse() {
+        if err.is_parse() {
             // this was an HTTP parse error.
             super::Error::new("http", "response.invalid")
         } else if err.is_user() {
