@@ -1,9 +1,6 @@
 #[cfg(feature = "reqwest-error")]
 mod reqwest;
 
-#[cfg(feature = "reqwest-error")]
-pub use self::reqwest::*;
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Error {
     pub class: String,
