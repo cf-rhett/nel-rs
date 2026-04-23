@@ -1,0 +1,36 @@
+# cargo-deny configuration — https://embarkstudios.github.io/cargo-deny/
+#
+# This repo is BSD-3-Clause. The allow-list below reflects licenses we've
+# vetted as compatible for permissive redistribution. Adding a new transitive
+# with a license not on the list is a deliberate decision — update this file
+# with a rationale.
+
+[licenses]
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "CDLA-Permissive-2.0",
+    "ISC",
+    "MIT",
+    "MPL-2.0",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
+]
+confidence-threshold = 0.93
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+[advisories]
+yanked = "deny"
+# Unmaintained crates and vulnerabilities produce hard errors by default.
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

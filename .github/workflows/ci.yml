@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+
+jobs:
+  check:
+    name: cargo check / fmt / clippy
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [stable, beta, "1.86"]
+        features: ["", "reqwest-error"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.toolchain }}-${{ matrix.features }}
+      - run: cargo fmt --all -- --check
+      - name: cargo check (default features == ${{ matrix.features }})
+        run: |
+          if [ -z "${{ matrix.features }}" ]; then
+            cargo check --all-targets --no-default-features
+          else
+            cargo check --all-targets --no-default-features --features "${{ matrix.features }}"
+          fi
+      - name: cargo clippy
+        run: |
+          if [ -z "${{ matrix.features }}" ]; then
+            cargo clippy --all-targets --no-default-features -- -D warnings
+          else
+            cargo clippy --all-targets --no-default-features --features "${{ matrix.features }}" -- -D warnings
+          fi
+
+  test:
+    name: cargo test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # Runs both feature combos. Live-network tests are gated behind
+      # `#[ignore]` and are not exercised here -- CI stays deterministic.
+      - run: cargo test --lib --no-default-features
+      - run: cargo test --lib
+      - run: cargo test --doc
+
+  doc:
+    name: cargo doc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo doc
+        env:
+          RUSTDOCFLAGS: -D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links
+        run: cargo doc --no-deps --all-features
+
+  deny:
+    name: cargo-deny
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check bans licenses advisories sources

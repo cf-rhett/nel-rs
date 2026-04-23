@@ -33,14 +33,14 @@ impl Error {
     }
 }
 
-impl ToString for Error {
-    fn to_string(&self) -> String {
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.class == "unknown" {
-            "unknown".to_string()
+            f.write_str("unknown")
         } else if self.class == "abandoned" {
-            "abandoned".to_string()
+            f.write_str("abandoned")
         } else {
-            format!("{}.{}", self.class, self.subclass)
+            write!(f, "{}.{}", self.class, self.subclass)
         }
     }
 }
