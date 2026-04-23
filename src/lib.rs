@@ -5,7 +5,7 @@ mod report;
 
 use deadqueue::limited::Queue;
 use futures_util::{future::Fuse, pin_mut, select, Future, FutureExt};
-use rand::{random, seq::SliceRandom, thread_rng};
+use rand::{random, rng, seq::IndexedRandom};
 use report::FailedReport;
 use serde::{Deserialize, Serialize};
 use std::sync::{LazyLock, Mutex};
@@ -241,5 +241,5 @@ fn choose_endpoint(report: &NELReport, evaluate_drop: bool) -> Option<String> {
     }
 
     // Return random endpoint if not dropped.
-    Some(group_policy.choose(&mut thread_rng())?.clone())
+    Some(group_policy.choose(&mut rng())?.clone())
 }
