@@ -14,7 +14,7 @@ futures-util = "0.3.17"
 lazy_static = "1.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-rustls = { version = "0.21", default-features = false }
+rustls = { version = "0.23", default-features = false, features = ["std"] }
 ttl_cache = "0.5.1"
 url = "2.2.2"
 rand = "0.10"
