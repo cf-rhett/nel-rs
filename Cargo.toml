@@ -5,7 +5,8 @@ version = "0.1.6"
 authors = ["Noah Kennedy <nkennedy@cloudflare.com>", "Brendan McMillion"]
 license = "BSD-3-Clause"
 repository = "https://github.com/cloudflare/nel-rs"
-edition = "2018"
+edition = "2024"
+rust-version = "1.86"
 
 [dependencies]
 deadqueue = { version = "0.2", features = ["limited"] }
