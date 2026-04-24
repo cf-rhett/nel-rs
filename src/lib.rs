@@ -3,15 +3,12 @@
 mod error;
 mod report;
 
-#[macro_use]
-extern crate lazy_static;
-
 use deadqueue::limited::Queue;
 use futures_util::{future::Fuse, pin_mut, select, Future, FutureExt};
 use rand::{random, seq::SliceRandom, thread_rng};
 use report::FailedReport;
 use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 use ttl_cache::TtlCache;
 use url::Url;
@@ -28,12 +25,11 @@ struct NELPolicy {
     failure_fraction: f32,
 }
 
-lazy_static! {
-    static ref NEL_POLICY_CACHE: Mutex<TtlCache<String, NELPolicy>> = Mutex::new(TtlCache::new(50));
-    static ref GROUP_POLICY_CACHE: Mutex<TtlCache<String, Vec<String>>> =
-        Mutex::new(TtlCache::new(50));
-    static ref REPORT_QUEUE: Queue<NELReport> = Queue::new(256);
-}
+static NEL_POLICY_CACHE: LazyLock<Mutex<TtlCache<String, NELPolicy>>> =
+    LazyLock::new(|| Mutex::new(TtlCache::new(50)));
+static GROUP_POLICY_CACHE: LazyLock<Mutex<TtlCache<String, Vec<String>>>> =
+    LazyLock::new(|| Mutex::new(TtlCache::new(50)));
+static REPORT_QUEUE: LazyLock<Queue<NELReport>> = LazyLock::new(|| Queue::new(256));
 
 #[derive(Serialize, Deserialize)]
 struct NelHeader {
