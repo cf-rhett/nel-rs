@@ -1,4 +1,4 @@
-use super::{find_deepest_text, find_source, Error};
+use super::{Error, find_deepest_text, find_source};
 
 impl From<&reqwest::Error> for Error {
     fn from(err: &reqwest::Error) -> Self {
@@ -123,7 +123,7 @@ fn classify_native_tls_text(text: &str) -> Option<Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::{classify_native_tls_text, Error};
+    use super::{Error, classify_native_tls_text};
 
     // ---- Offline substring tests for the native-tls fallback. ----
 

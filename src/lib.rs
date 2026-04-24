@@ -4,7 +4,7 @@ mod error;
 mod report;
 
 use deadqueue::limited::Queue;
-use futures_util::{future::Fuse, pin_mut, select, Future, FutureExt};
+use futures_util::{Future, FutureExt, future::Fuse, pin_mut, select};
 use rand::{random, rng, seq::IndexedRandom};
 use report::FailedReport;
 use serde::{Deserialize, Serialize};
